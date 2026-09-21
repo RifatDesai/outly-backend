@@ -28,4 +28,8 @@ urlpatterns = [
         ),
         name="swagger-ui",
     ),
+    path(
+    "api/v1/users/",
+    include("profiles.urls"),
+    ),
 ]

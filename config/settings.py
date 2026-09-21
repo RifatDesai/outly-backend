@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 
     "accounts",
     "rest_framework_simplejwt.token_blacklist",
+    "profiles",
 ]
 
 
