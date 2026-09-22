@@ -32,4 +32,8 @@ urlpatterns = [
     "api/v1/users/",
     include("profiles.urls"),
     ),
+    path(
+    "api/v1/",
+    include("follows.urls"),
+),
 ]
