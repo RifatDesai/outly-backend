@@ -1,0 +1,718 @@
+openapi: 3.0.3
+info:
+  title: OUTLY API
+  version: 1.0.0
+  description: Outdoor Social Network & Adventure Platform API
+paths:
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+        '400':
+          description: Invalid credentials
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+          description: ''
+        '400':
+          description: Invalid or expired refresh token
+  /api/v1/auth/refresh/:
+    post:
+      operationId: v1_auth_refresh_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResponse'
+          description: ''
+        '400':
+          description: Invalid refresh token
+  /api/v1/auth/register/:
+    post:
+      operationId: v1_auth_register_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+          description: ''
+        '400':
+          description: Validation failed
+  /api/v1/posts/:
+    get:
+      operationId: v1_posts_retrieve
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_posts_create
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/users/{user_id}/:
+    get:
+      operationId: v1_users_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicProfile'
+          description: ''
+  /api/v1/users/{user_id}/block/:
+    post:
+      operationId: v1_users_block_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Block'
+          description: ''
+    delete:
+      operationId: v1_users_block_destroy
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/{user_id}/follow/:
+    post:
+      operationId: v1_users_follow_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follow'
+          description: ''
+    delete:
+      operationId: v1_users_follow_destroy
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Follow'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                description: Follow relationship not found
+          description: ''
+  /api/v1/users/me/:
+    get:
+      operationId: v1_users_me_retrieve
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProfile'
+          description: ''
+    patch:
+      operationId: v1_users_me_partial_update
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMyProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMyProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMyProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProfile'
+          description: ''
+components:
+  schemas:
+    Block:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        blocker_id:
+          type: integer
+          readOnly: true
+        blocked_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - blocked_id
+      - blocker_id
+      - created_at
+      - id
+    Follow:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        follower_id:
+          type: integer
+          readOnly: true
+        following_id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - follower_id
+      - following_id
+      - id
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          additionalProperties: {}
+        errors:
+          nullable: true
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - errors
+      - message
+      - meta
+      - success
+    LogoutRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - refresh
+    LogoutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          additionalProperties: {}
+        errors:
+          nullable: true
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - errors
+      - message
+      - meta
+      - success
+    MyProfile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          maxLength: 50
+        display_name:
+          type: string
+          maxLength: 100
+        photo:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        bio:
+          type: string
+        interests: {}
+        privacy_settings: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - role
+      - status
+      - updated_at
+      - user_id
+      - username
+    PatchedMyProfile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          maxLength: 50
+        display_name:
+          type: string
+          maxLength: 100
+        photo:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        bio:
+          type: string
+        interests: {}
+        privacy_settings: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PublicProfile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 50
+        display_name:
+          type: string
+          maxLength: 100
+        photo:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        bio:
+          type: string
+        interests: {}
+      required:
+      - user_id
+      - username
+    RefreshTokenRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - refresh
+    RefreshTokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          additionalProperties: {}
+        errors:
+          nullable: true
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - errors
+      - message
+      - meta
+      - success
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          nullable: true
+          maxLength: 20
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+      required:
+      - email
+      - password
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          additionalProperties: {}
+        errors:
+          nullable: true
+        meta:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
+      - errors
+      - message
+      - meta
+      - success
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

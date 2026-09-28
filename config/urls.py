@@ -35,5 +35,8 @@ urlpatterns = [
     path(
     "api/v1/",
     include("follows.urls"),
-),
+    ),
+    path("api/v1/", include("posts.urls")),
+    path("api/v1/", include("comments.urls")),
+    path("api/v1/", include("activities.urls")),
 ]
