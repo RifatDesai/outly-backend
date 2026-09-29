@@ -59,9 +59,7 @@ class ActivityDetailView(APIView):
 
     def get_activity(self, activity_id):
         try:
-            return Activity.objects.get(
-                id=activity_id
-            )
+            return Activity.objects.get(id=activity_id)
         except Activity.DoesNotExist:
             return None
 

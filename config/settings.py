@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     "posts",
     "comments",
     "activities",
+    "places",
+    "trails",
 ]
 
 

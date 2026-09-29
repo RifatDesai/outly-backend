@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
+from places.urls import urlpatterns as places_urlpatterns
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -39,4 +40,6 @@ urlpatterns = [
     path("api/v1/", include("posts.urls")),
     path("api/v1/", include("comments.urls")),
     path("api/v1/", include("activities.urls")),
+    path("api/v1/", include(places_urlpatterns)),
+    path("api/v1/", include("trails.urls")),
 ]
