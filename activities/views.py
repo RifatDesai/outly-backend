@@ -1,3 +1,6 @@
+
+from django.db.models import Q
+
 from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -6,6 +9,7 @@ from rest_framework import status
 
 from .models import Activity
 from .serializers import ActivitySerializer
+from follows.models import Follow
 
 
 class ActivityListCreateView(APIView):
@@ -15,7 +19,14 @@ class ActivityListCreateView(APIView):
         responses=ActivitySerializer(many=True),
     )
     def get(self, request):
-        activities = Activity.objects.all().select_related("created_by")
+        activities = Activity.objects.filter(
+            Q(privacy="PUBLIC")
+            | Q(created_by=request.user)
+            | Q(
+                privacy="FOLLOWERS",
+                created_by__follower_relationships__follower=request.user,
+            )
+        ).select_related("created_by").distinct()
 
         serializer = ActivitySerializer(activities, many=True)
 
@@ -59,9 +70,26 @@ class ActivityDetailView(APIView):
 
     def get_activity(self, activity_id):
         try:
-            return Activity.objects.get(id=activity_id)
+            return Activity.objects.select_related(
+                "created_by"
+            ).get(id=activity_id)
         except Activity.DoesNotExist:
             return None
+
+    def activity_is_visible(self, activity, user):
+        if activity.created_by_id == user.id:
+            return True
+
+        if activity.privacy == "PUBLIC":
+            return True
+
+        if activity.privacy == "FOLLOWERS":
+            return Follow.objects.filter(
+                follower=user,
+                following_id=activity.created_by_id,
+            ).exists()
+
+        return False
 
     @extend_schema(
         responses=ActivitySerializer,
@@ -69,7 +97,9 @@ class ActivityDetailView(APIView):
     def get(self, request, activity_id):
         activity = self.get_activity(activity_id)
 
-        if activity is None:
+        if activity is None or not self.activity_is_visible(
+            activity, request.user
+        ):
             return Response({
                 "success": False,
                 "message": "Activity not found",
@@ -104,7 +134,7 @@ class ActivityDetailView(APIView):
                 "meta": {}
             }, status=status.HTTP_404_NOT_FOUND)
 
-        if activity.created_by != request.user:
+        if activity.created_by_id != request.user.id:
             return Response({
                 "success": False,
                 "message": "You can only edit your own activities",
