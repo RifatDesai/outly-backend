@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "activities",
     "places",
     "trails",
+    "events"
 ]
 
 

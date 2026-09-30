@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Activity
-from .serializers import ActivitySerializer
+from .models import Activity, ActivityParticipant
+from .serializers import ActivitySerializer, ActivityParticipantSerializer
 from follows.models import Follow
 
 
@@ -167,3 +167,77 @@ class ActivityDetailView(APIView):
             "errors": serializer.errors,
             "meta": {}
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ActivityJoinView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=None,
+        responses={201: ActivityParticipantSerializer},
+        description="Join an activity that the authenticated user can access."
+    )
+    def post(self, request, activity_id):
+        try:
+            activity = Activity.objects.select_related(
+                "created_by"
+            ).get(id=activity_id)
+        except Activity.DoesNotExist:
+            return Response({
+                "success": False,
+                "message": "Activity not found",
+                "data": None,
+                "errors": None,
+                "meta": {}
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Reuse the existing privacy rules.
+        detail_view = ActivityDetailView()
+        if not detail_view.activity_is_visible(activity, request.user):
+            return Response({
+                "success": False,
+                "message": "Activity not found",
+                "data": None,
+                "errors": None,
+                "meta": {}
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        if activity.created_by_id == request.user.id:
+            return Response({
+                "success": False,
+                "message": "You cannot join your own activity",
+                "data": None,
+                "errors": None,
+                "meta": {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if activity.status == Activity.Status.COMPLETED:
+            return Response({
+                "success": False,
+                "message": "You cannot join a completed activity",
+                "data": None,
+                "errors": None,
+                "meta": {}
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        participant, created = ActivityParticipant.objects.get_or_create(
+            activity=activity,
+            user=request.user
+        )
+
+        if not created:
+            return Response({
+                "success": False,
+                "message": "You have already joined this activity",
+                "data": None,
+                "errors": None,
+                "meta": {}
+            }, status=status.HTTP_409_CONFLICT)
+
+        return Response({
+            "success": True,
+            "message": "Activity joined successfully",
+            "data": ActivityParticipantSerializer(participant).data,
+            "errors": None,
+            "meta": {}
+        }, status=status.HTTP_201_CREATED)

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import ActivityListCreateView, ActivityDetailView
+from .views import ActivityListCreateView, ActivityDetailView, ActivityJoinView
 
 
 urlpatterns = [
@@ -13,5 +13,10 @@ urlpatterns = [
         "activities/<int:activity_id>/",
         ActivityDetailView.as_view(),
         name="activity-detail",
+    ),
+    path(
+    "<int:activity_id>/join/",
+    ActivityJoinView.as_view(),
+    name="activity-join"
     ),
 ]

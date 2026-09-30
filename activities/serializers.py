@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Activity
+from .models import Activity, ActivityParticipant
 from places.models import Place
 from trails.models import Trail
 
@@ -87,3 +87,17 @@ class ActivitySerializer(serializers.ModelSerializer):
             })
 
         return attrs
+
+class ActivityParticipantSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(read_only=True)
+    activity_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = ActivityParticipant
+        fields = [
+            "id",
+            "activity_id",
+            "user_id",
+            "joined_at",
+        ]
+        read_only_fields = fields

@@ -42,4 +42,5 @@ urlpatterns = [
     path("api/v1/", include("activities.urls")),
     path("api/v1/", include(places_urlpatterns)),
     path("api/v1/", include("trails.urls")),
+    path("api/v1/events/", include("events.urls")),
 ]

@@ -113,3 +113,29 @@ class Activity(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ActivityParticipant(models.Model):
+    activity = models.ForeignKey(
+        Activity,
+        on_delete=models.CASCADE,
+        related_name="participants"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="joined_activities"
+    )
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["activity", "user"],
+                name="unique_activity_participant"
+            )
+        ]
+        ordering = ["-joined_at"]
+
+    def __str__(self):
+        return f"{self.user.email} joined {self.activity.title}"
