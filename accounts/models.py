@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     terms_accepted_at = models.DateTimeField(
     null=True,
     blank=True,
-)
+    )
 
     phone = models.CharField(
         max_length=20,

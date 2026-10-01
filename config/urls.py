@@ -43,4 +43,8 @@ urlpatterns = [
     path("api/v1/", include(places_urlpatterns)),
     path("api/v1/", include("trails.urls")),
     path("api/v1/events/", include("events.urls")),
+    path("api/v1/groups/", include("groups.urls")),
+    path("api/v1/partner-requests/", include("partner_requests.urls")),
+    path("api/v1/chats/", include("chat.urls")),
+    path("api/v1/notifications/", include("notifications.urls")),
 ]
