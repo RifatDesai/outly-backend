@@ -1,3 +1,4 @@
+
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
@@ -8,6 +9,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from accounts.models import User
+from follows.models import Block
 
 from .models import UserProfile
 from .serializers import (
@@ -16,31 +18,42 @@ from .serializers import (
 )
 
 
+def get_user_profile(user):
+    profile, _ = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={
+            "username": f"user_{user.id}",
+        },
+    )
+    return profile
+
+
+def api_response(success, message, data=None, errors=None,
+                 http_status=status.HTTP_200_OK):
+    return Response(
+        {
+            "success": success,
+            "message": message,
+            "data": data,
+            "errors": errors,
+            "meta": {},
+        },
+        status=http_status,
+    )
+
+
 class MyProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @extend_schema(
-        responses=MyProfileSerializer,
-    )
+    @extend_schema(responses=MyProfileSerializer)
     def get(self, request):
-        profile, created = UserProfile.objects.get_or_create(
-            user=request.user,
-            defaults={
-                "username": f"user_{request.user.id}",
-            },
-        )
-
+        profile = get_user_profile(request.user)
         serializer = MyProfileSerializer(profile)
 
-        return Response(
-            {
-                "success": True,
-                "message": "Profile fetched successfully.",
-                "data": serializer.data,
-                "errors": None,
-                "meta": {},
-            },
-            status=status.HTTP_200_OK,
+        return api_response(
+            True,
+            "Profile fetched successfully.",
+            serializer.data,
         )
 
     @extend_schema(
@@ -48,12 +61,7 @@ class MyProfileView(APIView):
         responses=MyProfileSerializer,
     )
     def patch(self, request):
-        profile, created = UserProfile.objects.get_or_create(
-            user=request.user,
-            defaults={
-                "username": f"user_{request.user.id}",
-            },
-        )
+        profile = get_user_profile(request.user)
 
         serializer = MyProfileSerializer(
             profile,
@@ -62,59 +70,68 @@ class MyProfileView(APIView):
         )
 
         if not serializer.is_valid():
-            return Response(
-                {
-                    "success": False,
-                    "message": "Profile update failed.",
-                    "data": None,
-                    "errors": serializer.errors,
-                    "meta": {},
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+            return api_response(
+                False,
+                "Profile update failed.",
+                errors=serializer.errors,
+                http_status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer.save()
 
-        return Response(
-            {
-                "success": True,
-                "message": "Profile updated successfully.",
-                "data": serializer.data,
-                "errors": None,
-                "meta": {},
-            },
-            status=status.HTTP_200_OK,
+        return api_response(
+            True,
+            "Profile updated successfully.",
+            serializer.data,
         )
 
 
 class PublicProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    @extend_schema(
-        responses=PublicProfileSerializer,
-    )
+    @extend_schema(responses=PublicProfileSerializer)
     def get(self, request, user_id):
-        user = get_object_or_404(
-            User,
-            id=user_id,
-        )
+        user = get_object_or_404(User, id=user_id)
 
-        profile, created = UserProfile.objects.get_or_create(
-            user=user,
-            defaults={
-                "username": f"user_{user.id}",
-            },
-        )
+        # Users cannot view each other's profiles
+        # when either person has blocked the other.
+        if request.user.id != user.id:
+            blocked = Block.objects.filter(
+                blocker=request.user,
+                blocked=user,
+            ).exists()
+
+            blocked_by_user = Block.objects.filter(
+                blocker=user,
+                blocked=request.user,
+            ).exists()
+
+            if blocked or blocked_by_user:
+                return api_response(
+                    False,
+                    "Profile not found.",
+                    http_status=status.HTTP_404_NOT_FOUND,
+                )
+
+        profile = get_user_profile(user)
+
+        # The owner can still view their own profile.
+        if request.user.id != user.id:
+            visibility = (
+                profile.privacy_settings or {}
+            ).get("profile_visibility", "public")
+
+            if visibility == "private":
+                return api_response(
+                    False,
+                    "This profile is private.",
+                    http_status=status.HTTP_403_FORBIDDEN,
+                )
 
         serializer = PublicProfileSerializer(profile)
 
-        return Response(
-            {
-                "success": True,
-                "message": "User profile fetched successfully.",
-                "data": serializer.data,
-                "errors": None,
-                "meta": {},
-            },
-            status=status.HTTP_200_OK,
+        return api_response(
+            True,
+            "User profile fetched successfully.",
+            serializer.data,
         )

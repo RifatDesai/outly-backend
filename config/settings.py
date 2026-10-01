@@ -192,3 +192,24 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Outdoor Social Network & Adventure Platform API",
     "VERSION": "1.0.0",
 }
+# Add this near the bottom of config/settings.py.
+# Keep your existing settings; do not replace the entire settings.py file.
+import os
+
+if os.getenv("AWS_STORAGE_BUCKET_NAME") and os.getenv("AWS_S3_ENDPOINT_URL"):
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
+    AWS_S3_ADDRESSING_STYLE = "path"
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = os.getenv("AWS_QUERYSTRING_AUTH", "True").lower() == "true"

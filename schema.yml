@@ -149,6 +149,118 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /api/v1/{activity_id}/join/:
+    post:
+      operationId: v1_join_create
+      description: Join an activity that the authenticated user can access.
+      parameters:
+      - in: path
+        name: activity_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityParticipant'
+          description: ''
+  /api/v1/activities/:
+    get:
+      operationId: v1_activities_list
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+          description: ''
+    post:
+      operationId: v1_activities_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Activity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Activity'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+  /api/v1/activities/{activity_id}/:
+    get:
+      operationId: v1_activities_retrieve
+      parameters:
+      - in: path
+        name: activity_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+    patch:
+      operationId: v1_activities_partial_update
+      parameters:
+      - in: path
+        name: activity_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedActivity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedActivity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedActivity'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
   /api/v1/auth/login/:
     post:
       operationId: v1_auth_login_create
@@ -265,25 +377,596 @@ paths:
           description: ''
         '400':
           description: Validation failed
-  /api/v1/posts/:
+  /api/v1/events/:
     get:
-      operationId: v1_posts_retrieve
+      operationId: v1_events_list
       tags:
       - v1
       security:
       - jwtAuth: []
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+    post:
+      operationId: v1_events_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Event'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Event'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/v1/events/{event_id}/:
+    get:
+      operationId: v1_events_retrieve
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+    patch:
+      operationId: v1_events_partial_update
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/v1/events/{event_id}/invite/:
+    post:
+      operationId: v1_events_invite_create
+      description: Invite a user to an invite-only event. Supply user_id as a query
+        parameter.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      - in: query
+        name: user_id
+        schema:
+          type: integer
+        description: ID of the user to invite
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventParticipant'
+          description: ''
+  /api/v1/events/{event_id}/join/:
+    post:
+      operationId: v1_events_join_create
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventParticipant'
+          description: ''
+  /api/v1/events/{event_id}/moderate/:
+    patch:
+      operationId: v1_events_moderate_partial_update
+      description: Approve or reject a pending event. Only content moderators and
+        administrators may use this endpoint.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEventModeration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEventModeration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEventModeration'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/v1/places/:
+    get:
+      operationId: v1_places_list
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Place'
+          description: ''
+    post:
+      operationId: v1_places_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Place'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Place'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Place'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+          description: ''
+  /api/v1/places/{place_id}/:
+    get:
+      operationId: v1_places_retrieve
+      parameters:
+      - in: path
+        name: place_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+          description: ''
+  /api/v1/posts/:
+    get:
+      operationId: v1_posts_list
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+          description: ''
     post:
       operationId: v1_posts_create
       tags:
       - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Post'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Post'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+  /api/v1/posts/{post_id}/:
+    get:
+      operationId: v1_posts_retrieve
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
       security:
       - jwtAuth: []
       responses:
         '200':
           description: No response body
+    patch:
+      operationId: v1_posts_partial_update
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPost'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPost'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPost'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: ''
+    delete:
+      operationId: v1_posts_destroy
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/posts/{post_id}/comments/:
+    get:
+      operationId: v1_posts_comments_list
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+          description: ''
+    post:
+      operationId: v1_posts_comments_create
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Comment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Comment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/posts/{post_id}/like/:
+    post:
+      operationId: v1_posts_like_create
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_posts_like_destroy
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/posts/{post_id}/save/:
+    post:
+      operationId: v1_posts_save_create
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: v1_posts_save_destroy
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/posts/{post_id}/share/:
+    post:
+      operationId: v1_posts_share_create
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/posts/saved/:
+    get:
+      operationId: v1_posts_saved_retrieve
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/trails/:
+    get:
+      operationId: v1_trails_list
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trail'
+          description: ''
+    post:
+      operationId: v1_trails_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Trail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Trail'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trail'
+          description: ''
+  /api/v1/trails/{trail_id}/:
+    get:
+      operationId: v1_trails_retrieve
+      parameters:
+      - in: path
+        name: trail_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trail'
+          description: ''
+  /api/v1/trails/{trail_id}/points/:
+    get:
+      operationId: v1_trails_points_list
+      parameters:
+      - in: path
+        name: trail_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrailPoint'
+          description: ''
+    post:
+      operationId: v1_trails_points_create
+      parameters:
+      - in: path
+        name: trail_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrailPoint'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TrailPoint'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TrailPoint'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrailPoint'
+          description: ''
   /api/v1/users/{user_id}/:
     get:
       operationId: v1_users_retrieve
@@ -424,6 +1107,121 @@ paths:
           description: ''
 components:
   schemas:
+    Activity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 150
+        activity_type:
+          $ref: '#/components/schemas/ActivityTypeEnum'
+        description:
+          type: string
+        created_by_id:
+          type: integer
+          readOnly: true
+        place_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        trail_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        location:
+          type: string
+          maxLength: 200
+        start_at:
+          type: string
+          format: date-time
+          nullable: true
+        end_at:
+          type: string
+          format: date-time
+          nullable: true
+        distance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        duration:
+          type: string
+          maxLength: 100
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        notes:
+          type: string
+        privacy:
+          $ref: '#/components/schemas/PrivacyEnum'
+        status:
+          $ref: '#/components/schemas/ActivityStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by_id
+      - id
+      - title
+      - updated_at
+    ActivityParticipant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        activity_id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        joined_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - activity_id
+      - id
+      - joined_at
+      - user_id
+    ActivityStatusEnum:
+      enum:
+      - PLANNED
+      - COMPLETED
+      type: string
+      description: |-
+        * `PLANNED` - Planned
+        * `COMPLETED` - Completed
+    ActivityTypeEnum:
+      enum:
+      - HIKE
+      - TRAIL_RUN
+      - CYCLING
+      - CAMPING
+      - MEETUP
+      type: string
+      description: |-
+        * `HIKE` - Hike
+        * `TRAIL_RUN` - Trail Run
+        * `CYCLING` - Cycling
+        * `CAMPING` - Camping
+        * `MEETUP` - Meetup
+    BlankEnum:
+      enum:
+      - ''
     Block:
       type: object
       properties:
@@ -445,6 +1243,202 @@ components:
       - blocker_id
       - created_at
       - id
+    CategoryEnum:
+      enum:
+      - HIKE
+      - TRAIL_RUN
+      - CYCLING
+      - CAMPING
+      - MEETUP
+      - CLEANUP_DRIVE
+      type: string
+      description: |-
+        * `HIKE` - Hike
+        * `TRAIL_RUN` - Trail run
+        * `CYCLING` - Cycling
+        * `CAMPING` - Camping
+        * `MEETUP` - Meetup
+        * `CLEANUP_DRIVE` - Cleanup drive
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        post:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_id
+      - content
+      - created_at
+      - id
+      - post
+      - updated_at
+    DifficultyEnum:
+      enum:
+      - EASY
+      - MODERATE
+      - HARD
+      type: string
+      description: |-
+        * `EASY` - Easy
+        * `MODERATE` - Moderate
+        * `HARD` - Hard
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizer_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        place_id:
+          type: integer
+          nullable: true
+        trail_id:
+          type: integer
+          nullable: true
+        location:
+          type: string
+          maxLength: 255
+        meeting_point:
+          type: string
+          maxLength: 255
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+          nullable: true
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        requires_approval:
+          type: boolean
+        visibility:
+          $ref: '#/components/schemas/EventVisibilityEnum'
+        approval_status:
+          allOf:
+          - $ref: '#/components/schemas/EventApprovalStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - approval_status
+      - capacity
+      - category
+      - created_at
+      - id
+      - location
+      - organizer_id
+      - start_at
+      - title
+      - updated_at
+    EventApprovalStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+    EventModerationApprovalStatusEnum:
+      enum:
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `APPROVED` - APPROVED
+        * `REJECTED` - REJECTED
+    EventParticipant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        event_id:
+          type: integer
+          readOnly: true
+        user_id:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EventParticipantStatusEnum'
+          readOnly: true
+        joined_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - event_id
+      - id
+      - joined_at
+      - status
+      - updated_at
+      - user_id
+    EventParticipantStatusEnum:
+      enum:
+      - INVITED
+      - PENDING
+      - APPROVED
+      - REJECTED
+      type: string
+      description: |-
+        * `INVITED` - Invited
+        * `PENDING` - Pending approval
+        * `APPROVED` - Approved
+        * `REJECTED` - Rejected
+    EventVisibilityEnum:
+      enum:
+      - PUBLIC
+      - FOLLOWERS
+      - INVITED
+      type: string
+      description: |-
+        * `PUBLIC` - Public
+        * `FOLLOWERS` - Followers only
+        * `INVITED` - Only invited
     Follow:
       type: object
       properties:
@@ -577,6 +1571,133 @@ components:
       - updated_at
       - user_id
       - username
+    PatchedActivity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 150
+        activity_type:
+          $ref: '#/components/schemas/ActivityTypeEnum'
+        description:
+          type: string
+        created_by_id:
+          type: integer
+          readOnly: true
+        place_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        trail_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        location:
+          type: string
+          maxLength: 200
+        start_at:
+          type: string
+          format: date-time
+          nullable: true
+        end_at:
+          type: string
+          format: date-time
+          nullable: true
+        distance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        duration:
+          type: string
+          maxLength: 100
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        notes:
+          type: string
+        privacy:
+          $ref: '#/components/schemas/PrivacyEnum'
+        status:
+          $ref: '#/components/schemas/ActivityStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        organizer_id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        place_id:
+          type: integer
+          nullable: true
+        trail_id:
+          type: integer
+          nullable: true
+        location:
+          type: string
+          maxLength: 255
+        meeting_point:
+          type: string
+          maxLength: 255
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+          nullable: true
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        requires_approval:
+          type: boolean
+        visibility:
+          $ref: '#/components/schemas/EventVisibilityEnum'
+        approval_status:
+          allOf:
+          - $ref: '#/components/schemas/EventApprovalStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedEventModeration:
+      type: object
+      properties:
+        approval_status:
+          $ref: '#/components/schemas/EventModerationApprovalStatusEnum'
     PatchedMyProfile:
       type: object
       properties:
@@ -618,6 +1739,239 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedPost:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          readOnly: true
+        caption:
+          type: string
+          maxLength: 500
+        visibility:
+          $ref: '#/components/schemas/PostVisibilityEnum'
+        activity_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        place_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PostStatusEnum'
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostMedia'
+          readOnly: true
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+          writeOnly: true
+          maxItems: 4
+        likes_count:
+          type: string
+          readOnly: true
+        comments_count:
+          type: string
+          readOnly: true
+        shares_count:
+          type: string
+          readOnly: true
+        saves_count:
+          type: string
+          readOnly: true
+        is_liked:
+          type: string
+          readOnly: true
+        is_saved:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Place:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        coordinates: {}
+        category:
+          type: string
+          maxLength: 100
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        distance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        estimated_duration:
+          type: string
+          maxLength: 100
+        facilities: {}
+        safety_notes:
+          type: string
+        images: {}
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        is_verified:
+          type: boolean
+      required:
+      - category
+      - coordinates
+      - id
+      - name
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          readOnly: true
+        caption:
+          type: string
+          maxLength: 500
+        visibility:
+          $ref: '#/components/schemas/PostVisibilityEnum'
+        activity_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        place_id:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PostStatusEnum'
+          readOnly: true
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostMedia'
+          readOnly: true
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+          writeOnly: true
+          maxItems: 4
+        likes_count:
+          type: string
+          readOnly: true
+        comments_count:
+          type: string
+          readOnly: true
+        shares_count:
+          type: string
+          readOnly: true
+        saves_count:
+          type: string
+          readOnly: true
+        is_liked:
+          type: string
+          readOnly: true
+        is_saved:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author_id
+      - caption
+      - comments_count
+      - created_at
+      - id
+      - is_liked
+      - is_saved
+      - likes_count
+      - media
+      - saves_count
+      - shares_count
+      - status
+      - updated_at
+    PostMedia:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        url:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - url
+    PostStatusEnum:
+      enum:
+      - ACTIVE
+      - DELETED
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `DELETED` - Deleted
+    PostVisibilityEnum:
+      enum:
+      - PUBLIC
+      - FOLLOWERS
+      - GROUP
+      type: string
+      description: |-
+        * `PUBLIC` - Public
+        * `FOLLOWERS` - Followers
+        * `GROUP` - Group
+    PrivacyEnum:
+      enum:
+      - PUBLIC
+      - FOLLOWERS
+      - PRIVATE
+      type: string
+      description: |-
+        * `PUBLIC` - Public
+        * `FOLLOWERS` - Followers
+        * `PRIVATE` - Private
     PublicProfile:
       type: object
       properties:
@@ -675,6 +2029,10 @@ components:
     Register:
       type: object
       properties:
+        full_name:
+          type: string
+          writeOnly: true
+          maxLength: 100
         email:
           type: string
           format: email
@@ -687,9 +2045,18 @@ components:
           type: string
           writeOnly: true
           minLength: 8
+        confirm_password:
+          type: string
+          writeOnly: true
+        terms_accepted:
+          type: boolean
+          writeOnly: true
       required:
+      - confirm_password
       - email
+      - full_name
       - password
+      - terms_accepted
     RegisterResponse:
       type: object
       properties:
@@ -711,6 +2078,85 @@ components:
       - message
       - meta
       - success
+    Trail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        location:
+          type: string
+          maxLength: 200
+        difficulty:
+          oneOf:
+          - $ref: '#/components/schemas/DifficultyEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        distance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        estimated_duration:
+          type: string
+          maxLength: 100
+        facilities: {}
+        safety_notes:
+          type: string
+        images: {}
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        is_verified:
+          type: boolean
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrailPoint'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - location
+      - name
+      - points
+      - updated_at
+    TrailPoint:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+        sequence:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+      - id
+      - latitude
+      - longitude
+      - sequence
   securitySchemes:
     jwtAuth:
       type: http
